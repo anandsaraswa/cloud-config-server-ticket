@@ -17,3 +17,5 @@ microservice:
     endpoints:
       endpoint:
         uri:http://TICKET-SERVICE/ticket/book
+        
+test: http://ACCOUNT-SERVICE/account/create
