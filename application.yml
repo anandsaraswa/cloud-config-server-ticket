@@ -19,3 +19,4 @@ microservice:
         uri:http://TICKET-SERVICE/ticket/book
         
 test: http://TICKET-SERVICE/ticket/book
+auth: http://AUTHENTICATE-SERVICE/secure/token/validate
