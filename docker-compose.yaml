@@ -1,0 +1,68 @@
+version: '3.7'
+services:      
+    service-registry:
+        image: anandfullstack/microservicedemo-service-registry:latest
+        mem_limit: 700m
+        ports:
+          - "8761:8761"
+        networks:
+          - account-network
+        
+    account-service:
+        image: anandfullstack/microservicedemo-account-service:latest
+        mem_limit: 700m
+        ports:
+         - "9111:9111"
+        networks:
+          - account-network
+        depends_on:
+          - service-registry
+        environment:
+            EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+
+    
+    ticket-service:
+        image: anandfullstack/microservicedemo-ticket-service:latest
+        mem_limit: 700m
+        ports:
+         - "9112:9112"
+        networks:
+          - account-network
+        depends_on:
+          - service-registry
+        environment:
+            EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+            
+    authenticate-service:
+        image: anandfullstack/microservicedemo-authenticate-service:latest
+        mem_limit: 700m
+        ports:
+         - "9113:9113"
+        networks:
+          - account-network
+        depends_on:
+          - service-registry
+        environment:
+            EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+          
+    cloud-gateway:
+        image: anandfullstack/microservicedemo-cloud-gateway:latest
+        mem_limit: 700m
+        ports:
+         - "8787:8787"
+        networks:
+          - account-network
+        depends_on:
+          - service-registry
+        environment:
+            EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+            SPRING.CLOUD.GATEWAY.ROUTES[0].PREDICATES: Path=/account/**
+            SPRING.CLOUD.GATEWAY.ROUTES[0].URI: http://account-service:9111
+            SPRING.CLOUD.GATEWAY.ROUTES[1].PREDICATES: Path=/ticket/**
+            SPRING.CLOUD.GATEWAY.ROUTES[1].URI: http://ticket-service:9112
+            SPRING.CLOUD.GATEWAY.ROUTES[2].PREDICATES: Path=/secure/**
+            SPRING.CLOUD.GATEWAY.ROUTES[2].URI: http://authenticate-service:9113
+       
+            
+networks:
+    account-network:
